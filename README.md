@@ -1,2 +1,2 @@
 # Inventory-Management-System-Backend
-A backend system offering APIs for managing products, categories, stock levels, and transactions, enabling efficient inventory tracking and stock monitoring
+This is the backend for an Inventory Management System that facilitates efficient inventory tracking and stock monitoring. It provides RESTful APIs to manage products, categories, stock levels, and transactions. 
