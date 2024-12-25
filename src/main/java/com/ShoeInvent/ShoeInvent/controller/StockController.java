@@ -4,9 +4,17 @@ import com.ShoeInvent.ShoeInvent.dto.TransactionTypeDTO;
 import com.ShoeInvent.ShoeInvent.service.StockService;
 import com.ShoeInvent.ShoeInvent.service.TransactionTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -42,4 +50,45 @@ public class StockController {
         stockService.deleteStock(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/barcode")
+    public ResponseEntity<byte[]> getBarcodeByStockId(@PathVariable int id) {
+        byte[] barcode = stockService.getBarcodeByStockId(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(barcode);
+    }
+
+    @GetMapping("/{id}/barcode/download")
+    public ResponseEntity<InputStreamResource> downloadBarcodePdfByStockId(@PathVariable int id,
+                                                                           @RequestParam(required = false) String downloadDir,
+                                                                           @RequestParam(defaultValue = "1") int stockCount) {
+        try {
+            // Call the service to generate the PDF with barcode copies
+            Path pdfFilePath = stockService.downloadBarcodeByStockId(id, downloadDir, stockCount);
+
+            // Create the resource for file streaming
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(pdfFilePath.toFile()));
+
+            // Build and return the response entity with proper headers
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdfFilePath.getFileName().toString() + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(resource);
+        } catch (FileNotFoundException e) {
+            // Return a 404 response if the file does not exist
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        } catch (RuntimeException e) {
+            // Return a 500 response for runtime exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        } catch (Exception e) {
+            // General exception handler for any other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+
 }
