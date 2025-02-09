@@ -6,10 +6,7 @@ import com.ShoeInvent.ShoeInvent.entity.Category;
 import com.ShoeInvent.ShoeInvent.entity.ProductType;
 import com.ShoeInvent.ShoeInvent.entity.Transactions;
 import com.ShoeInvent.ShoeInvent.exception.ResourceNotFoundException;
-import com.ShoeInvent.ShoeInvent.repository.CategoryRepository;
-import com.ShoeInvent.ShoeInvent.repository.ProductTypeRepository;
-import com.ShoeInvent.ShoeInvent.repository.StockRepository;
-import com.ShoeInvent.ShoeInvent.repository.TransactionsRepository;
+import com.ShoeInvent.ShoeInvent.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +20,8 @@ public class TransactionsService {
     private TransactionsRepository transactionsRepository;
     @Autowired
     private StockRepository stockRepository;
+    @Autowired
+    private TransactionTypeRepository transactionTypeRepository;
 
     public List<TransactionsDTO> getAllTransactions() {
         return transactionsRepository.findAll().stream()
@@ -63,7 +62,7 @@ public class TransactionsService {
 
     private TransactionsDTO mapToDTO(Transactions transaction) {
         TransactionsDTO dto = new TransactionsDTO();
-        dto.setTid(transaction.getTid());
+        dto.setTransactionTypeId(transaction.getTransactionType().getTtid());
         dto.setTid(transaction.getTid());
         dto.setStockId(transaction.getStock().getStockID());
         dto.setQuantity(transaction.getQuantity());
@@ -74,8 +73,7 @@ public class TransactionsService {
 
     private Transactions mapToEntity(TransactionsDTO dto) {
         Transactions transaction = new Transactions();
-        transaction.setTid(dto.getTid());
-        transaction.setTid(dto.getTid());
+        transaction.setTransactionType(transactionTypeRepository.getReferenceById(dto.getTransactionTypeId()));
         transaction.setStock(stockRepository.getReferenceById(dto.getStockId()));
         transaction.setQuantity(dto.getQuantity());
         transaction.setTimestamp(dto.getTimestamp());
