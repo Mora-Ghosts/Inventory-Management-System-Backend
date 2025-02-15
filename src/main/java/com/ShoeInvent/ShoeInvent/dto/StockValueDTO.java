@@ -9,14 +9,7 @@ public class StockValueDTO {
 
     // Default Constructor
     public StockValueDTO() {
-    }
-
-    // Constructor matching the query
-    // public StockValueDTO(String category, String productType, Double totalValue) {
-    //     this.category = category;
-    //     this.productType = productType;
-    //     this.totalValue = totalValue;
-    // } 
+    } 
     // Constructor matching the query
     public StockValueDTO(String category, String productType, BigDecimal totalValue) {
         this.category = category;
